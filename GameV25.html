@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guessing Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: pink;
+      color: black; /* Default text color */
+    }
+    #guessInput {
+      width: 50px;
+    }
+    .heart {
+      color: red;
+    }
+    .reset-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      margin-top: 20px;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      background-color: #ff6666;
+    }
+    #revealBtn {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      background-color: #ffcc00;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    .confetti {
+      width: 10px;
+      height: 10px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0.7;
+      animation: confetti-fall 3s ease-out infinite;
+    }
+    .game-over {
+      font-size: 72px;
+      font-weight: bold;
+      color: red;
+    }
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(0) rotateZ(0);
+      }
+      100% {
+        transform: translateY(100vh) rotateZ(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Guess the Number (1-100)</h1>
+  <p id="chances">Chances left: <span class="heart">❤️</span><span class="heart">❤️</span><span class="heart">❤️</span><span class="heart">❤️</span><span class="heart">❤️</span></p>
+  <p>Enter your guess:</p>
+  <input type="number" id="guessInput">
+  <button onclick="checkGuess()">Guess</button>
+  <p id="message"></p>
+  <button id="resetBtn" class="reset-btn" onclick="resetGame()">⟳ Reset Game</button>
+  <button id="revealBtn" onclick="revealNumber()">Reveal Number</button>
+  <div id="confetti"></div>
+  <div id="gameOverText" class="game-over" style="display: none;">GAME OVER</div>
+
+  <script>
+    let chances = 5; // Number of chances
+    const hearts = document.querySelectorAll('.heart'); // Select all heart elements
+    const revealBtn = document.getElementById('revealBtn'); // Select the reveal button
+    const resetBtn = document.getElementById('resetBtn'); // Select the reset button
+    const confettiContainer = document.getElementById('confetti'); // Select the confetti container
+    const gameOverText = document.getElementById('gameOverText'); // Select the game over text
+    const randomNumber = Math.floor(Math.random() * 100) + 1; // Generate a random number between 1 and 100
+    console.log(randomNumber);
+
+    function checkGuess() {
+      const guess = parseInt(document.getElementById('guessInput').value); // Get the value entered by the player
+      chances--; // Decrement the number of chances
+
+      if (guess === randomNumber) {
+        showMessage('Congratulations! You guessed the correct number!');
+        disableInputAndButton();
+        showConfetti();
+        revealBtn.style.display = 'none'; // Hide the reveal button after correct guess
+      } else if (chances === 0) {
+        showMessage(`Sorry, you've run out of chances. The correct number was ${randomNumber}.`);
+        disableInputAndButton();
+        resetBtn.style.display = 'block'; // Show the reset button
+        resetBtn.style.color = 'white'; // Change reset button color to white
+        resetBtn.style.fontSize = '28px'; // Increase reset button font size
+        revealBtn.style.display = 'none'; // Hide the reveal button
+        gameOverText.style.display = 'block'; // Show the game over text
+        document.body.style.backgroundColor = 'black'; // Change background color to black
+        document.body.style.color = 'white'; // Change text color to white
+      } else if (guess < randomNumber) {
+        showMessage(`Too low! Try a higher number. Chances left: ${chances}`);
+        hearts[chances].style.display = 'none'; // Hide a heart for each wrong guess
+      } else {
+        showMessage(`Too high! Try a lower number. Chances left: ${chances}`);
+        hearts[chances].style.display = 'none'; // Hide a heart for each wrong guess
+      }
+    }
+
+    function showMessage(message) {
+      document.getElementById('message').textContent = message; // Display a message to the player
+    }
+
+    function disableInputAndButton() {
+      document.getElementById('guessInput').disabled = true; // Disable the input field
+      document.querySelector('button').disabled = true; // Disable the button
+    }
+
+    function resetGame() {
+      window.location.reload(); // Reload the page to reset the game
+    }
+
+    function revealNumber() {
+      alert(`The correct number is ${randomNumber}.`);
+      revealBtn.style.display = 'none'; // Hide the reveal button after revealing the number
+    }
+
+    function showConfetti() {
+      const colors = ['#ff66cc', '#9966ff', '#66ccff', '#99ff66', '#ff6666', '#ffff66'];
+      for (let i = 0; i < 200; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = `${Math.random() * 100}vw`;
+        confetti.style.top = `${Math.random() * 100}vh`;
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+        confetti.style.animationDelay = `${Math.random() * 2}s`;
+        confettiContainer.appendChild(confetti);
+      }
+    }
+
+    window.addEventListener('scroll', function() {
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+        revealBtn.style.display = 'block'; // Show the reveal button when scrolled to the bottom
+      }
+    });
+  </script>
+</body>
+</html>
